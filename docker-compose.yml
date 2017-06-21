@@ -11,6 +11,7 @@ services:
             - /var/www/volt/neos/:/var/www/volt/neos
             - /var/www/volt/store/:/var/www/volt/store
             - /var/www/adminer/:/var/www/adminer
+            - ../tickets/:/var/www/tickets
 #            - ../sample/:/var/www/sample
 
 ### Workspace Utilities Container ###########################
@@ -60,7 +61,7 @@ services:
                 - INSTALL_BCMATH=false
                 #- INSTALL_PHPREDIS=false
                 - INSTALL_MEMCACHED=false
-                - INSTALL_OPCACHE=false
+                - INSTALL_OPCACHE=true
                 #- INSTALL_EXIF=false
                 - INSTALL_AEROSPIKE_EXTENSION=false
                 - CODEIGNITER=false
@@ -90,6 +91,7 @@ services:
         volumes:
             - ./logs/nginx/:/var/log/nginx
             - ./nginx/sites/:/etc/nginx/sites-available
+            - ./nginx/auth/:/etc/nginx/auth
         ports:
             - "80:80"
             - "443:443"
@@ -122,6 +124,16 @@ services:
             - mysql:/var/lib/mysql
         ports:
             - "9999:3306"
+
+### FakeSmtp Container #########################################
+
+    fakesmtp:
+        build:
+            context: ./fakesmtp
+        volumes:
+            - ./fakesmtp/mail:/var/mail/
+        ports:
+            - "2525:25"
 
 ### MongoDB Container #######################################
 
@@ -238,6 +250,8 @@ volumes:
     minio:
         driver: "local"
     phpmyadmin:
+        driver: "local"
+    fakesmtp:
         driver: "local"
     caddy:
         driver: "local"
