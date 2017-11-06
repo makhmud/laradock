@@ -8,9 +8,14 @@ services:
         image: tianon/true
         volumes:
             - /var/www/swp/:/var/www/swp
+            - /var/www/kopp/:/var/www/kopp
             - /var/www/volt/neos/:/var/www/volt/neos
             - /var/www/volt/store/:/var/www/volt/store
+            - /var/www/volt/store_au/:/var/www/volt/store_au
             - /var/www/adminer/:/var/www/adminer
+            - /var/www/volt/solo/:/var/www/volt/solo
+            - /var/www/spacial/:/var/www/spacial
+            - /var/www/d8_test/:/var/www/d8_test
             - ../tickets/:/var/www/tickets
 #            - ../sample/:/var/www/sample
 
@@ -57,7 +62,7 @@ services:
                 - INSTALL_XDEBUG=false
                 - INSTALL_SOAP=false
                 - INSTALL_MONGO=false
-                - INSTALL_ZIP_ARCHIVE=true
+                - INSTALL_ZIP_ARCHIVE=false
                 - INSTALL_BCMATH=false
                 #- INSTALL_PHPREDIS=false
                 - INSTALL_MEMCACHED=false
@@ -65,7 +70,7 @@ services:
                 #- INSTALL_EXIF=false
                 - INSTALL_AEROSPIKE_EXTENSION=false
                 - CODEIGNITER=false
-            dockerfile: Dockerfile-56
+            dockerfile: Dockerfile-71
         volumes_from:
             - applications
         expose:
@@ -78,6 +83,37 @@ services:
         environment:
             # IMPORTANT: Set the Remote Interpreter entry matching name to `laravel`
             - PHP_IDE_CONFIG=serverName=laravel
+
+### PHP-FPM Container #######################################
+
+#    php-fpm7:
+#        build:
+#            context: ./php-fpm
+#            args:
+#                - INSTALL_XDEBUG=false
+#                - INSTALL_SOAP=false
+#                - INSTALL_MONGO=false
+#                - INSTALL_ZIP_ARCHIVE=false
+#                - INSTALL_BCMATH=false
+#                #- INSTALL_PHPREDIS=false
+#                - INSTALL_MEMCACHED=false
+#                - INSTALL_OPCACHE=true
+#                #- INSTALL_EXIF=false
+#                - INSTALL_AEROSPIKE_EXTENSION=false
+#                - CODEIGNITER=false
+#            dockerfile: Dockerfile-71
+#        volumes_from:
+#            - applications
+#        expose:
+#            - "9001"
+#        links:
+#            - workspace
+#        extra_hosts:
+#            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+#            - "dockerhost:10.0.75.1"
+#        environment:
+#            # IMPORTANT: Set the Remote Interpreter entry matching name to `laravel`
+#            - PHP_IDE_CONFIG=serverName=laravel
 
 ### Nginx Server Container ##################################
 
@@ -134,6 +170,23 @@ services:
             - ./fakesmtp/mail:/var/mail/
         ports:
             - "2525:25"
+
+### WkHtmlToPDF Container #########################################
+
+#    wkhtmltopdf:
+#        image: yappabe/wkhtmltopdf-aas
+#        volumes:
+#            - ./wkhtmltopdf/data/:/data
+#        links:
+#            - php-fpm
+#        environment:
+#            SERVER_PORT: 6666
+#            SERVER_API_KEY: dummy
+#            WKHTMLTOPDF_BIN: "/usr/local/bin/wkhtmltopdf"
+#        volumes:
+#            - ./fakesmtp/mail:/var/mail/
+#        ports:
+#            - "2525:25"
 
 ### MongoDB Container #######################################
 
@@ -247,6 +300,8 @@ volumes:
         driver: "local"
     mongo:
         driver: "local"
+#    wkhtmltopdf:
+#        driver: "local"
     minio:
         driver: "local"
     phpmyadmin:
